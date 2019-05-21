@@ -1,10 +1,16 @@
 <?php
   if ( !isset( $_POST['ms'] ) ) exit;
 
+  header( 'Content-Type:application/json' );
+
   $ms = $_POST['ms'];
 
   $filename = 'chat.txt';
   $fh = fopen( $filename, 'r');
+  if ( filesize( $filename ) == 0 ) {
+    echo '{"msgs":[],"timestamp":0}';
+    exit;
+  }
   $content = fread( $fh, filesize( $filename ) );
   fclose( $fh );
 
@@ -25,5 +31,5 @@
     $response->timestamp = (int) $line[0];
   }
 
-  header( 'Content-Type:application/json' );
+
   echo json_encode( $response );

@@ -63,7 +63,20 @@ $( document ).ready( function() {
         $( '#m' ).attr('placeholder','Deine Nachricht ...' );
         username = userinput;
       } else {
-        createMessage( '<b>'+username+' sagt:</b> '+userinput ,false );
+        switch ( userinput ) {
+          case '/clear':
+            $.ajax({
+              url:'http://localhost/tag20/phpchat/chat.ajax.clear.php',
+            });
+
+            $( '#messages' ).empty().append(
+              $( '<li>' ).html( '<em>Verlauf geleert</em>')
+            );
+
+            break;
+          default:
+            createMessage( '<b>'+username+' sagt:</b> '+userinput ,false );
+        }
       }
     }
     $('#m').val('').trigger('focus');

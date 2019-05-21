@@ -20,3 +20,13 @@
 - Response-Daten:
   * msgs [ARRAY mit STRING]
   * timestamp [s]
+
+## lösche alle Nachrichten
+- URL: http://localhost/tag20/phpchat/chat.ajax.clear.php
+- Request-Methode: POST
+- Request-Format: x-www-urlencoded (Standard)
+- Request-Daten:
+  * empty
+- Response-Format: HTML
+- Response-Daten:
+  * empty

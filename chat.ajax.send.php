@@ -8,6 +8,11 @@
   $time = time();
   $line = $time.';'.$msg.'
 ';
+/*
+  if ( strpos( $line, "/clear" ) !== false ) {
+    $line = '';
+  }
+*/
 
   fwrite( $fh, $line );
   fclose( $fh );
