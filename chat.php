@@ -4,7 +4,6 @@
 
     function send( $message ) {
       global $clientSocketArr;
-
       //$message = $this->seal( json_encode( array('msg'=>$message) ) );
 
       $message = $this->seal( $message );
