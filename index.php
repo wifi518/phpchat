@@ -5,7 +5,8 @@
     <title>PHP Chat</title>
     <link rel="stylesheet" href="style.css">
     <script src="jquery-3.4.1.min.js"></script>
-    <script src="chat.ajax.js"></script>
+    <!-- <script src="chat.ajax.js"></script> -->
+    <script src="chat.websocket.js"></script>
   </head>
   <body>
 
