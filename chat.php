@@ -121,12 +121,12 @@
         echo "Client #".$socketID." Nachricht: ".$message."\n";
         $msg = json_decode( $message );
 
-        if ( !isset( $msg->type  ) ) break;
+        if ( !isset( $msg->type  ) ) break; // wenn Browserfenster geschlossen wird
 
         $who = 'all';
         switch( $msg->type ) {
           case 'logout':
-            $message4client = $socketUser[ $socketID ]. ' hat sich ausgeloggt.';          
+            $message4client = $socketUser[ $socketID ]. ' hat sich ausgeloggt.';
             unset($socketUser[$socketID]);
           break;
           case 'login':
