@@ -125,6 +125,10 @@
 
         $who = 'all';
         switch( $msg->type ) {
+          case 'logout':
+            $message4client = $socketUser[ $socketID ]. ' hat sich ausgeloggt.';          
+            unset($socketUser[$socketID]);
+          break;
           case 'login':
               $socketUser[ $socketID ] = $msg->msg;
               $message4client =  $socketUser[ $socketID ]. ' hat sich eingeloggt.';

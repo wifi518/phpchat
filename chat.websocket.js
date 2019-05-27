@@ -45,11 +45,17 @@ $( document ).ready( function() {
         $( '#m' ).attr( 'placeholder', 'Deine Nachricht...' );
       } else {
         switch( userinput ) {
+          case '/exit':
+            websocket.send( buildMessage('logout',''));
+            username = '';
+            $( '#m' ).attr( 'placeholder', 'Dein Name' );
+          break;
           case '/users':
             websocket.send( buildMessage('userlist',''));
           break;
           default:
             websocket.send( buildMessage('message',userinput));
+        
         }
 
       }
