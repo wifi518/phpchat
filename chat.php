@@ -2,15 +2,17 @@
 
   class ChatHandler {
 
-    function send( $message ) {
+    function send( $message, $who ) {
       global $clientSocketArr;
       //$message = $this->seal( json_encode( array('msg'=>$message) ) );
 
       $message = $this->seal( $message );
 
       $len = strlen( $message );
-      foreach( $clientSocketArr as $clientSocket ) {
-        @socket_write( $clientSocket, $message, $len );
+      foreach( $clientSocketArr as $socketId => $clientSocket ) {
+        if ( $who == 'all' || $who ==  $socketId ) {
+          @socket_write( $clientSocket, $message, $len );
+        }
       }
       return true;
     }
@@ -79,6 +81,8 @@
   define( 'PORT', '5001' );
   $null = NULL;
 
+  $clientid = 1;
+
   $socket = socket_create( AF_INET, SOCK_STREAM, SOL_TCP );
   socket_set_option( $socket, SOL_SOCKET, SO_REUSEADDR, 1);
   socket_bind( $socket, 0, PORT );
@@ -89,17 +93,18 @@
   echo 'SocketServer auf Port 5001 läuft.
 ';
 
-  print_r( $clientSocketArr );
+  //print_r( $clientSocketArr );
+
+  $socketUser = array();
 
   while( true ) {
-    sleep(1);
+    //sleep(1);
     $newSocketArr = $clientSocketArr;
     socket_select( $newSocketArr, $null, $null, 0, 10);
     if ( in_array( $socket, $newSocketArr ) ) {
-      echo 'neue Verbindung
-  ';
+      echo "neue Verbindung\n";
       $newSocket = socket_accept( $socket );
-      $clientSocketArr[] = $newSocket;
+      $clientSocketArr[$clientid++] = $newSocket;
 
       $header = socket_read( $newSocket, 1024 );
       $chatHandler->doHandshake( $header, $newSocket, HOST, PORT);
@@ -108,13 +113,42 @@
       unset( $newSocketArr[$newIndex] );
 
     }
-    foreach( $newSocketArr as $res ) {
-      while( socket_recv( $res, $socketData, 1024, 0 ) >= 1 ) {
+    foreach( $newSocketArr as $socketID => $res ) {
+      while( @socket_recv( $res, $socketData, 1024, 0 ) >= 1 ) {
+
         $message = $chatHandler->unseal( $socketData );
-        $chatHandler->send( $message );
+
+        echo "Client #".$socketID." Nachricht: ".$message."\n";
+        $msg = json_decode( $message );
+
+        if ( !isset( $msg->type  ) ) break;
+
+        $who = 'all';
+        switch( $msg->type ) {
+          case 'login':
+              $socketUser[ $socketID ] = $msg->msg;
+              $message4client =  $socketUser[ $socketID ]. ' hat sich eingeloggt.';
+          break;
+          case 'message':
+            $message4client = '<b>'.$socketUser[ $socketID ].' sagt:</b> '.$msg->msg;
+          break;
+          case 'userlist':
+              $message4client = 'eingeloggte User: '.implode(',',$socketUser );
+              $who = $socketID;
+          break;
+        }
+
+        $chatHandler->send( $message4client, $who );
         break 2;
       }
-      //$socketData = @socket_read($res, 1024, PHP_NORMAL_READ);
+
+      // quit
+      $socketData = @socket_read($res, 1024, PHP_NORMAL_READ);
+      if ($socketData === false) {
+        $chatHandler->send(  $socketUser[ $socketID ]. ' hat sich ausgeloggt.', 'all')  ;
+        unset($clientSocketArr[$socketID]);
+        unset($socketUser[$socketID]);
+      }//
     }
 
 

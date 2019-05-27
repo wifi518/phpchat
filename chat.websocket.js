@@ -17,13 +17,23 @@ function startSocketConnection() {
     writeMessage( 'Verbindungsfehler.' );
   }
   websocket.onmessage = function( e ) {
-    writeMessage( e.data );
+    if ( username != '' ) {
+      writeMessage( e.data );
+    }
   }
+
 }
+
+var buildMessage = function( type, msg ) {
+  var mObject = {type:type, msg:msg }
+  return JSON.stringify(mObject);
+}
+
+
 
 $( document ).ready( function() {
   startSocketConnection();
-  
+
   $( 'form' ).on( 'submit', function( e ) {
     e.preventDefault();
     var userinput = $('#m').val();
@@ -31,9 +41,17 @@ $( document ).ready( function() {
       if( username == '' ) {
         username = userinput;
 
-        websocket.send( username + ' hat sich eingeloggt.' );
+        websocket.send( buildMessage('login',username));
+        $( '#m' ).attr( 'placeholder', 'Deine Nachricht...' );
       } else {
-        websocket.send( '<b>'+username+' sagt:</b>' + userinput );
+        switch( userinput ) {
+          case '/users':
+            websocket.send( buildMessage('userlist',''));
+          break;
+          default:
+            websocket.send( buildMessage('message',userinput));
+        }
+
       }
     }
     $('#m').val('').trigger('focus');
