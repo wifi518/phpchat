@@ -7,7 +7,7 @@
 - Request-Daten:
   * msg [STRING]
 - Response-Format: HTML
-- Response-Daten:
+- Response-Daten: 
   * Timestamp [s]
 
 ## hole Nachrichten von Server (abrufen)
